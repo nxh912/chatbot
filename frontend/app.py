@@ -60,24 +60,20 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
     date = datetime.datetime.utcnow()
     utc_time = calendar.timegm(date.utctimetuple())
 
-    sql = f" INSERT INTO ChatLog(who, message, datetime) VALUES ( 'user', '{prompt}', '{utc_time}');";
-    log.info(f"LOG SQL : {sql}")
+    conn = res['sqlite_conn']
 
-    '''
-    openai.RateLimitError: Error code: 429 - 
-    {'error':
-       {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.',
-        'type': 'insufficient_quota',
-        'param': None,
-        'code': 'insufficient_quota'}}
+    values_to_insert = [('user', prompt, utc_time)]
+    cursor.executemany("""
+        INSERT INTO ChatLog ('who', 'message', 'datetime')
+        VALUES (?, ?, ?)""", values_to_insert)
 
-    '''
-
+    sqlite = res['sqlite_conn']
     client = res['openai_client']
 
     #log.debug(f" openai.ChatCompletion.create : '%s'", openai.ChatCompletion.create)
     log.debug(f" res    : '%s'", res)
     log.debug(f" client : '%s'", client)
+    log.debug(f" sqlite : '%s'", sqlite)
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -103,3 +99,4 @@ def get_bot_response():
 
 if __name__ == "__main__":  
     app.run(debug=True)
+    
