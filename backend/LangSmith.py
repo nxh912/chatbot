@@ -1,7 +1,6 @@
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI()
-#llm = ChatOpenAI(api_key="")
 llm.invoke("how can langsmith help with testing?")
 
 '''
