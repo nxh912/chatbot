@@ -1,16 +1,14 @@
 conn, cursor = 1, 1
 
-#Final app.py 
-#import files
 from flask import Flask, render_template, request
 import openai
-import tempfile
+import os, tempfile
 import sqlite3
 import calendar
 import datetime
- 
+import logging,traceback
 from openai import OpenAI
-
+log = logging.getLogger('main')
 
 def init_sqlite( sqlfile) : 
     con = sqlite3.connect( sqlfile)
@@ -19,15 +17,16 @@ def init_sqlite( sqlfile) :
     assert(conn)
     assert(cursor)
 
-    #Doping EMPLOYEE table if already exists.
     cursor.execute("DROP TABLE IF EXISTS ChatLog")
 
     #Creating table as per requirement
-    sql ='''CREATE TABLE ChatLog(
-        who CHAR(10) NOT NULL,
-        message CHAR(256) NOT NULL,
-        datetime INT  NOT NULL
-    )'''
+    sql = '''
+    CREATE TABLE ChatLog(
+        who      CHAR(10)  NOT NULL,
+        message  CHAR(256) NOT NULL,
+        datetime INT       NOT NULL
+    );
+    '''
     cursor.execute( sql)
     assert ( conn)
     return conn
@@ -44,30 +43,42 @@ def init_client():
 
     client = OpenAI(
         # defaults to os.environ.get("OPENAI_API_KEY")
-        api_key="private",
+        api_key=os.environ.get("OPENAI_API_KEY"),
     )
     return { "openai_client": client, 'sqlite_conn': conn, 'sqlite_cursor': conn.cursor}
 
 res = init_client()
 
-print(f"LINE 53, openai_client : {res['openai_client']}")
-print(f"LINE 54, sqlite_conn   : {res['sqlite_conn']}")
-print(f"LINE 54, sqlite_cursor : {res['sqlite_cursor']}")
+log.debug(f"LINE 53, openai_client : %s", res['openai_client'])
+log.debug(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
+log.debug(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
 
 def get_completion( prompt, model="gpt-3.5-turbo"):
-    print(f"DEBUG: get_completion : '{prompt}'")
+    log.debug(f" get_completion : '%s'", prompt)
     messages = [{"role": "user", "content": prompt}]
 
     date = datetime.datetime.utcnow()
     utc_time = calendar.timegm(date.utctimetuple())
 
     sql = f" INSERT INTO ChatLog(who, message, datetime) VALUES ( 'user', '{prompt}', '{utc_time}');";
-    print(f" SQL : {sql}")
+    log.info(f"LOG SQL : {sql}")
 
-    print(f"LINE_70 : DEBUG  openai.ChatCompletion.create : '{openai.ChatCompletion.create}'")
-    print(f"LINE_71 : DEBUG  res : {res}")
+    '''
+    openai.RateLimitError: Error code: 429 - 
+    {'error':
+       {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.',
+        'type': 'insufficient_quota',
+        'param': None,
+        'code': 'insufficient_quota'}}
+
+    '''
 
     client = res['openai_client']
+
+    #log.debug(f" openai.ChatCompletion.create : '%s'", openai.ChatCompletion.create)
+    log.debug(f" res    : '%s'", res)
+    log.debug(f" client : '%s'", client)
+
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}]
@@ -76,7 +87,8 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
 
 
 app = Flask(__name__)
-openai.api_key  = "<place your openai_api_key>"
+openai.api_key  = os.environ.get("OPENAI_API_KEY")
+log.debug("OPENAI_API_KEY : '%s'", openai.api_key)
 
 @app.route("/")
 def home():    
@@ -85,11 +97,9 @@ def home():
 @app.route("/get")
 def get_bot_response():    
     userText = request.args.get('msg')
-    print(f"userText : '{userText}'")
+    log.debug("userText : '%s'", userText)
     response = get_completion( userText)  
-    #return str(bot.get_response(userText)) 
     return response
-
 
 if __name__ == "__main__":  
     app.run(debug=True)
