@@ -7,9 +7,26 @@ import sqlite3
 import calendar
 import datetime
 import logging,traceback
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
 from openai import OpenAI
 log = logging.getLogger('main')
 log.setLevel( logging.INFO)
+
+global model
+model="gpt-3.5-turbo"
+
+def init_mongo():
+    uri = "monodb://nxh912@chatbot.gnjxjtw.mongodb.net/?retryWrites=true&w=majority&appName=ChatBot"
+    client = MongoClient(uri, server_api=ServerApi('1'))
+    # Send a ping to confirm a successful connection
+    try:
+        client.admin.command('ping')
+        log.error("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        log.error(e)
+    return client
 
 def init_sqlite( sqlfile) : 
     con = sqlite3.connect( sqlfile)
@@ -40,15 +57,22 @@ def init_client():
     print(f"##   cursor  : {cursor}")
     assert( conn)
     assert( cursor)
+    api_key = os.environ.get("OPENAI_API_KEY")
 
-    client = OpenAI( api_key = os.environ.get("OPENAI_API_KEY") )
-    return { "openai_client": client, 'sqlite_conn': conn, 'sqlite_cursor': cursor}
+    client = OpenAI( api_key=api_key )
+
+    mongo_client = None
+    #mongo_client = init_mongo()
+    return { "openai_client": client,
+             'sqlite_conn': conn, 'sqlite_cursor': cursor,
+             'mongo_conn': mongo_client}
 
 res = init_client()
 
 log.error(f"LINE 53, openai_client : %s", res['openai_client'])
 log.error(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
 log.error(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
+log.error(f"LINE 69, mongo_conn : %s", res['mongo_conn'])
 
 def get_completion( prompt, model="gpt-3.5-turbo"):
     # or gpt-3.5-turbo-0125 / gpt-3.5-turbo-16k / gpt-3.5-turbo-1106 / gpt-4o-mini
