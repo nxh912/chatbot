@@ -9,6 +9,7 @@ import datetime
 import logging,traceback
 from openai import OpenAI
 log = logging.getLogger('main')
+log.setLevel( logging.INFO)
 
 def init_sqlite( sqlfile) : 
     con = sqlite3.connect( sqlfile)
@@ -29,62 +30,62 @@ def init_sqlite( sqlfile) :
     '''
     cursor.execute( sql)
     assert ( conn)
-    return conn
+    return conn,cursor
 
 def init_client():
     sqlfile = tempfile.NamedTemporaryFile(mode='w+b', suffix=".sqlite", dir=None)                          
-    print(f"logfile : {sqlfile.name}")
 
-    conn = init_sqlite( sqlfile.name)
-    print(f"##   logfile : {sqlfile.name}")
+    conn, cursor = init_sqlite( sqlfile.name)
+    print(f"##   sqlfile : {sqlfile.name}")
     print(f"##   conn    : {conn}")
+    print(f"##   cursor  : {cursor}")
     assert( conn)
-    assert( conn.cursor)
+    assert( cursor)
 
-    client = OpenAI(
-        # defaults to os.environ.get("OPENAI_API_KEY")
-        api_key=os.environ.get("OPENAI_API_KEY"),
-    )
-    return { "openai_client": client, 'sqlite_conn': conn, 'sqlite_cursor': conn.cursor}
+    client = OpenAI( api_key = os.environ.get("OPENAI_API_KEY") )
+    return { "openai_client": client, 'sqlite_conn': conn, 'sqlite_cursor': cursor}
 
 res = init_client()
 
-log.debug(f"LINE 53, openai_client : %s", res['openai_client'])
-log.debug(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
-log.debug(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
+log.error(f"LINE 53, openai_client : %s", res['openai_client'])
+log.error(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
+log.error(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
 
 def get_completion( prompt, model="gpt-3.5-turbo"):
-    log.debug(f" get_completion : '%s'", prompt)
+    log.error(f" get_completion : '%s'", prompt)
     messages = [{"role": "user", "content": prompt}]
 
     date = datetime.datetime.utcnow()
     utc_time = calendar.timegm(date.utctimetuple())
 
-    conn = res['sqlite_conn']
-
-    values_to_insert = [('user', prompt, utc_time)]
-    cursor.executemany("""
-        INSERT INTO ChatLog ('who', 'message', 'datetime')
-        VALUES (?, ?, ?)""", values_to_insert)
-
-    sqlite = res['sqlite_conn']
     client = res['openai_client']
+    sqlite = res['sqlite_conn']
+    cursor = res['sqlite_cursor']
+    # for m in dir( cursor ): print( f"sqlite.cursor . {m}")
 
-    #log.debug(f" openai.ChatCompletion.create : '%s'", openai.ChatCompletion.create)
-    log.debug(f" res    : '%s'", res)
-    log.debug(f" client : '%s'", client)
-    log.debug(f" sqlite : '%s'", sqlite)
+    sql_query = """INSERT INTO ChatLog
+                          (who, message, datetime) 
+                           VALUES 
+                          ('me','{}',{});""".format( prompt, date)
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response.choices[0].message["content"]
+    #count = cursor.execute(sql_query)
+    #sqlite.commit()
+    log.info("SQL : %s", sql_query)
+
+    #log.error(f" openai.ChatCompletion.create : '%s'", openai.ChatCompletion.create)
+    log.error(f" res    : '%s'", res)
+    log.error(f" client : '%s'", client)
+    log.error(f" sqlite : '%s'", sqlite)
+    log.error(f" cursor : '%s'", sqlite.cursor)
+
+    log.error( "response : %s", str(messages))
+    return "RESPONSE : " + str(messages)
+    #return response.choices[0].message["content"]
 
 
 app = Flask(__name__)
 openai.api_key  = os.environ.get("OPENAI_API_KEY")
-log.debug("OPENAI_API_KEY : '%s'", openai.api_key)
+log.error( "LINE 106 ... OPENAI_API_KEY : '%s'", openai.api_key)
 
 @app.route("/")
 def home():    
@@ -93,10 +94,9 @@ def home():
 @app.route("/get")
 def get_bot_response():    
     userText = request.args.get('msg')
-    log.debug("userText : '%s'", userText)
+    log.error("userText : '%s'", userText)
     response = get_completion( userText)  
     return response
 
 if __name__ == "__main__":  
     app.run(debug=True)
-    
