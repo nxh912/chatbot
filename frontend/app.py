@@ -74,36 +74,35 @@ log.error(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
 log.error(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
 log.error(f"LINE 69, mongo_conn : %s", res['mongo_conn'])
 
-def get_completion( prompt, modelText="gpt-3.5-turbo"):
-    # or gpt-3.5-turbo-0125 / gpt-3.5-turbo-16k / gpt-3.5-turbo-1106 / gpt-4o-mini
-    log.error(f"L79 get_completion : prompt:'%s', modelText: '%s'", prompt, modelText)
-    if len(prompt)< 1: return
-    messages = [{"role": "user", "content": prompt}]
-
-    date = datetime.datetime.utcnow()
-    utc_time = calendar.timegm(date.utctimetuple())
-
+def get_completion( prompt, modelText):
+    # gpt-3.5-turbo or gpt-3.5-turbo-0125 / gpt-3.5-turbo-16k / gpt-3.5-turbo-1106 / gpt-4o-mini
     client = res['openai_client']
     sqlite = res['sqlite_conn']
     cursor = res['sqlite_cursor']
+    if not(bool(modelText)) or modelText=="None": modelText="gpt-3.5-turbo"
+
+    log.error(f"L79 get_completion : prompt:'%s', modelText: '%s'", prompt, modelText)
+    if len(prompt)< 1: return
+
+    messages = [{"role": "user", "content": prompt}]
+    date = datetime.datetime.utcnow()
+    utc_time = calendar.timegm(date.utctimetuple())
+
 
     sql_query = """INSERT INTO ChatLog
                           ( message, datetime) 
                             VALUES ('{}',{});
                 """.format( prompt, date)
-    
-    if not modelText: modelText="gpt-3.5-turbo"
 
     #count = cursor.execute(sql_query)
     #sqlite.commit()
     log.error("SQL : %s", sql_query)
-
-    #log.error(f" openai.ChatCompletion.create : '%s'", openai.ChatCompletion.create)
     log.error(f"1. res    : '%s'", res)
     log.error(f"2. client : '%s'", client)
     log.error(f"3. sqlite : '%s'", sqlite)
     log.error(f"4. cursor : '%s'", sqlite.cursor)
     log.error(f"5. modelText : '%s'", modelText)
+    if not bool(modelText) or modelText == 'None': modelText
 
     response = client.chat.completions.create(
         model = modelText,
@@ -132,7 +131,7 @@ def get_bot_response():
     userText = request.args.get('msg')
     log.error("L133 userText : '%s'", userText)
     gptmodel = request.args.get('gptmodel')
-    log.error("gptmodel : '%s'", gptmodel)
+    log.error("L135 gptmodel : '%s'", gptmodel)
     assert( gptmodel != 'None')
     log.error("L137 gptmodel : '%s'", gptmodel)
     response = get_completion( userText, gptmodel)

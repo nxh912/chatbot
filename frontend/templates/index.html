@@ -79,7 +79,7 @@
 
     <div class="boxed">
       LLM: 
-      <input type="text" name="gptmodel" list="LLMList" placeholder="Default LLM">
+      <input type="text" id="gptmodel" list="LLMList" placeholder="Default LLM">
       <datalist id="LLMList">
         <option value="gpt-3.5-turbo" selected/> 
         <option value="gpt-3.5-turbo-16k"/> 
@@ -100,13 +100,17 @@
       <script>
           function getBotResponse() {
               var rawText = $("#textInput").val();
+              var llmText = $("#gptmodel").val()
               var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
+              console.log(llmText)
+              //alert(llmText)
+              
               $("#textInput").val("");
               $("#chatbox").append(userHtml);
               document
                   .getElementById("userInput")
                   .scrollIntoView({ block: "start", behavior: "smooth" });
-              $.get("/get", { msg: rawText, modelText: 'gpt-3.5-turbo' }).done(function (data) {
+              $.get("/get", { msg: rawText, modelText: llmText }).done(function (data) {
                   var botHtml = '<p class="botText"><span>' + data + "</span></p>";
                   $("#chatbox").append(botHtml);
                   document
