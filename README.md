@@ -8,9 +8,11 @@ MVP comprises:
 1. Task 2: A frontend component that presents LLM data to the users
 
 ## Installation
-Running ChatBot:
+Running ChatBot (CLI):
+ - ```cd backend```
+
+Running ChatBot (UI):
  - ```cd frontend```
- - Enter APT-KEY in ```frontend/.env```
- - E.g. ``` OPENAI_API_KEY=sk-None-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ```
+ - ```export OPENAI_API_KEY=sk-None-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ```
  - ```python3 app.py```
  - Point the browser to ```http://127.0.0.1:5000```
