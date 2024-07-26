@@ -77,15 +77,16 @@
   <h1 align="center"><b>ChatBot</b></h1>
   <h4 align="center"><b>Please type start your personalized interaction with the chatbot</b></h4>
 
-    <input type="text" name="gptmodel" list="modelList">
-    <datalist id="modelList">
-      <option value="gpt-3.5-turbo" selected/> 
-      <option value="gpt-3.5-turbo-16k"/> 
-      <option value="gpt-3.5-turbo-1106"/> 
-      <option value="gpt-4o-mini"/> 
-    </datalist>
-
     <div class="boxed">
+      LLM: 
+      <input type="text" name="gptmodel" list="LLMList" placeholder="Default LLM">
+      <datalist id="LLMList">
+        <option value="gpt-3.5-turbo" selected/> 
+        <option value="gpt-3.5-turbo-16k"/> 
+        <option value="gpt-3.5-turbo-1106"/> 
+        <option value="gpt-4o-mini"/> 
+      </datalist>
+  
       <div>
         <div id="chatbox">
           <p class="botText">
@@ -105,7 +106,7 @@
               document
                   .getElementById("userInput")
                   .scrollIntoView({ block: "start", behavior: "smooth" });
-              $.get("/get", { msg: rawText }).done(function (data) {
+              $.get("/get", { msg: rawText, modelText: 'gpt-3.5-turbo' }).done(function (data) {
                   var botHtml = '<p class="botText"><span>' + data + "</span></p>";
                   $("#chatbox").append(botHtml);
                   document

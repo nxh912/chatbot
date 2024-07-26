@@ -74,9 +74,9 @@ log.error(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
 log.error(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
 log.error(f"LINE 69, mongo_conn : %s", res['mongo_conn'])
 
-def get_completion( prompt, model="gpt-3.5-turbo"):
+def get_completion( prompt, modelText="gpt-3.5-turbo"):
     # or gpt-3.5-turbo-0125 / gpt-3.5-turbo-16k / gpt-3.5-turbo-1106 / gpt-4o-mini
-    log.error(f" get_completion : '%s'", prompt)
+    log.error(f"L79 get_completion : prompt:'%s', modelText: '%s'", prompt, modelText)
     if len(prompt)< 1: return
     messages = [{"role": "user", "content": prompt}]
 
@@ -91,30 +91,26 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
                           ( message, datetime) 
                             VALUES ('{}',{});
                 """.format( prompt, date)
+    
+    if not modelText: modelText="gpt-3.5-turbo"
 
     #count = cursor.execute(sql_query)
     #sqlite.commit()
     log.error("SQL : %s", sql_query)
 
     #log.error(f" openai.ChatCompletion.create : '%s'", openai.ChatCompletion.create)
-    log.error(f" res    : '%s'", res)
-    log.error(f" client : '%s'", client)
-    log.error(f" sqlite : '%s'", sqlite)
-    log.error(f" cursor : '%s'", sqlite.cursor)
+    log.error(f"1. res    : '%s'", res)
+    log.error(f"2. client : '%s'", client)
+    log.error(f"3. sqlite : '%s'", sqlite)
+    log.error(f"4. cursor : '%s'", sqlite.cursor)
+    log.error(f"5. modelText : '%s'", modelText)
 
     response = client.chat.completions.create(
-        model = model,
-        # "gpt-3.5-turbo",
-        # "gpt-4o-mini",
-        messages = [
-            {
-              "role": "system",
-              "content": prompt
-            },
-        ]
+        model = modelText,
+        messages = [{ "role": "system", "content": prompt }]
     )
     log.error( "messages : %s", str(messages))
-    #log.error( "\nreturn response : %s", response)
+
     if response and response.choices and response.choices[0]:
         content = response.choices[0].message.content
         log.error( "\n\nL96 response.choices[0].message.content : \n%s", content)
@@ -132,10 +128,14 @@ def home():
     return render_template("index.html")
 
 @app.route("/get")
-def get_bot_response():    
+def get_bot_response():
     userText = request.args.get('msg')
-    log.error("userText : '%s'", userText)
-    response = get_completion( userText)  
+    log.error("L133 userText : '%s'", userText)
+    gptmodel = request.args.get('gptmodel')
+    log.error("gptmodel : '%s'", gptmodel)
+    assert( gptmodel != 'None')
+    log.error("L137 gptmodel : '%s'", gptmodel)
+    response = get_completion( userText, gptmodel)
     return response
 
 if __name__ == "__main__":  
