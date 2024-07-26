@@ -51,7 +51,9 @@ log.error(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
 log.error(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
 
 def get_completion( prompt, model="gpt-3.5-turbo"):
+    # or gpt-3.5-turbo-0125 / gpt-3.5-turbo-16k / gpt-3.5-turbo-1106 / gpt-4o-mini
     log.error(f" get_completion : '%s'", prompt)
+    if len(prompt)< 1: return
     messages = [{"role": "user", "content": prompt}]
 
     date = datetime.datetime.utcnow()
@@ -88,9 +90,13 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
             },
         ]
     )
-    log.error( "response : %s", str(messages))
-    #return "RESPONSE : " + str(messages)
-    return response.choices[0].message["content"]
+    log.error( "messages : %s", str(messages))
+    log.error( "\nreturn response : %s", response)
+    if response and response.choices and response.choices[0]:
+        log.error( "\n\nL96 response.choices[0].message.content : \n%s", response.choices[0].message.content)
+        return response.choices[0].message.content
+    else:
+        return str( response)
 
 app = Flask(__name__)
 openai.api_key  = os.environ.get("OPENAI_API_KEY")
