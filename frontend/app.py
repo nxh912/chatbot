@@ -62,7 +62,6 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
     client = res['openai_client']
     sqlite = res['sqlite_conn']
     cursor = res['sqlite_cursor']
-    # for m in dir( cursor ): print( f"sqlite.cursor . {m}")
 
     sql_query = """INSERT INTO ChatLog
                           ( message, datetime) 
@@ -86,15 +85,17 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
         messages = [
             {
               "role": "system",
-              "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."
+              "content": prompt
             },
         ]
     )
     log.error( "messages : %s", str(messages))
-    log.error( "\nreturn response : %s", response)
+    #log.error( "\nreturn response : %s", response)
     if response and response.choices and response.choices[0]:
-        log.error( "\n\nL96 response.choices[0].message.content : \n%s", response.choices[0].message.content)
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        log.error( "\n\nL96 response.choices[0].message.content : \n%s", content)
+        content = content.replace("\n", "\n<br/>")
+        return str( content)
     else:
         return str( response)
 
