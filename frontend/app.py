@@ -23,9 +23,9 @@ def init_mongo():
     # Send a ping to confirm a successful connection
     try:
         client.admin.command('ping')
-        log.error("Pinged your deployment. You successfully connected to MongoDB!")
+        log.info("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
-        log.error(e)
+        log.info(e)
     return client
 
 def init_sqlite( sqlfile) : 
@@ -69,10 +69,10 @@ def init_client():
 
 res = init_client()
 
-log.error(f"LINE 53, openai_client : %s", res['openai_client'])
-log.error(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
-log.error(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
-log.error(f"LINE 69, mongo_conn : %s", res['mongo_conn'])
+log.info(f"LINE 53, openai_client : %s", res['openai_client'])
+log.info(f"LINE 54, sqlite_conn   : %s", res['sqlite_conn'])
+log.info(f"LINE 55, sqlite_cursor : %s", res['sqlite_cursor'])
+log.info(f"LINE 69, mongo_conn : %s", res['mongo_conn'])
 
 def get_completion( prompt, modelText):
     # gpt-3.5-turbo or gpt-3.5-turbo-0125 / gpt-3.5-turbo-16k / gpt-3.5-turbo-1106 / gpt-4o-mini
@@ -81,7 +81,7 @@ def get_completion( prompt, modelText):
     cursor = res['sqlite_cursor']
     if not(bool(modelText)) or modelText=="None": modelText="gpt-3.5-turbo"
 
-    log.error(f"L79 get_completion : prompt:'%s', modelText: '%s'", prompt, modelText)
+    log.info(f"L79 get_completion : prompt:'%s', modelText: '%s'", prompt, modelText)
     if len(prompt)< 1: return
 
     messages = [{"role": "user", "content": prompt}]
@@ -96,23 +96,23 @@ def get_completion( prompt, modelText):
 
     #count = cursor.execute(sql_query)
     #sqlite.commit()
-    log.error("SQL : %s", sql_query)
-    log.error(f"1. res    : '%s'", res)
-    log.error(f"2. client : '%s'", client)
-    log.error(f"3. sqlite : '%s'", sqlite)
-    log.error(f"4. cursor : '%s'", sqlite.cursor)
-    log.error(f"5. modelText : '%s'", modelText)
+    log.info("SQL : %s", sql_query)
+    log.info(f"1. res    : '%s'", res)
+    log.info(f"2. client : '%s'", client)
+    log.info(f"3. sqlite : '%s'", sqlite)
+    log.info(f"4. cursor : '%s'", sqlite.cursor)
+    log.info(f"5. modelText : '%s'", modelText)
     if not bool(modelText) or modelText == 'None': modelText
 
     response = client.chat.completions.create(
         model = modelText,
         messages = [{ "role": "system", "content": prompt }]
     )
-    log.error( "messages : %s", str(messages))
+    log.info( "messages : %s", str(messages))
 
     if response and response.choices and response.choices[0]:
         content = response.choices[0].message.content
-        log.error( "\n\nL96 response.choices[0].message.content : \n%s", content)
+        log.info( "\n\nL96 response.choices[0].message.content : \n%s", content)
         content = content.replace("\n", "\n<br/>")
         return str( content)
     else:
@@ -120,7 +120,7 @@ def get_completion( prompt, modelText):
 
 app = Flask(__name__)
 openai.api_key  = os.environ.get("OPENAI_API_KEY")
-log.error( "LINE 106 ... OPENAI_API_KEY : '%s'", openai.api_key)
+log.info( "LINE 106 ... OPENAI_API_KEY : '%s'", openai.api_key)
 
 @app.route("/")
 def home():    
@@ -129,11 +129,11 @@ def home():
 @app.route("/get")
 def get_bot_response():
     userText = request.args.get('msg')
-    log.error("L133 userText : '%s'", userText)
+    log.info("L133 userText : '%s'", userText)
     gptmodel = request.args.get('gptmodel')
-    log.error("L135 gptmodel : '%s'", gptmodel)
+    log.info("L135 gptmodel : '%s'", gptmodel)
     assert( gptmodel != 'None')
-    log.error("L137 gptmodel : '%s'", gptmodel)
+    log.info("L137 gptmodel : '%s'", gptmodel)
     response = get_completion( userText, gptmodel)
     return response
 
