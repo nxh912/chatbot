@@ -23,8 +23,7 @@ def init_sqlite( sqlfile) :
     #Creating table as per requirement
     sql = '''
     CREATE TABLE ChatLog(
-        who      CHAR(10)  NOT NULL,
-        message  CHAR(256) NOT NULL,
+        message  CHAR(1024) NOT NULL,
         datetime INT       NOT NULL
     );
     '''
@@ -64,13 +63,13 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
     # for m in dir( cursor ): print( f"sqlite.cursor . {m}")
 
     sql_query = """INSERT INTO ChatLog
-                          (who, message, datetime) 
-                           VALUES 
-                          ('me','{}',{});""".format( prompt, date)
+                          ( message, datetime) 
+                            VALUES ('{}',{});
+                """.format( prompt, date)
 
     #count = cursor.execute(sql_query)
     #sqlite.commit()
-    log.info("SQL : %s", sql_query)
+    log.error("SQL : %s", sql_query)
 
     #log.error(f" openai.ChatCompletion.create : '%s'", openai.ChatCompletion.create)
     log.error(f" res    : '%s'", res)
@@ -78,10 +77,20 @@ def get_completion( prompt, model="gpt-3.5-turbo"):
     log.error(f" sqlite : '%s'", sqlite)
     log.error(f" cursor : '%s'", sqlite.cursor)
 
+    response = client.chat.completions.create(
+        model = model,
+        # "gpt-3.5-turbo",
+        # "gpt-4o-mini",
+        messages = [
+            {
+              "role": "system",
+              "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."
+            },
+        ]
+    )
     log.error( "response : %s", str(messages))
-    return "RESPONSE : " + str(messages)
-    #return response.choices[0].message["content"]
-
+    #return "RESPONSE : " + str(messages)
+    return response.choices[0].message["content"]
 
 app = Flask(__name__)
 openai.api_key  = os.environ.get("OPENAI_API_KEY")
