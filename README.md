@@ -9,21 +9,14 @@ MVP comprises:
 
 ## Installation
 Running ChatBot (CLI) on port 8000:
+ - ```export OPENAI_API_KEY=sk-None-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx```
  - ```cd backend```
  - ```fastapi dev ChatBotREST.py```
  
-Running ChatBot (UI) on port 5000:
- - ```cd frontend```
- - ```export OPENAI_API_KEY=sk-None-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ```
- - ```python3 app.py```
- - Point the browser to ```http://127.0.0.1:5000```
-
-## Running Backend
-
- ```
- cd backend/
- fastapi dev backend/ChatBotREST.py
- ```
+```
+cd backend/
+fastapi dev backend/ChatBotREST.py
+```
 
 ```
 ### curl 'http://127.0.0.1:8000/chat?query=good+morning&model=gpt-3.5-turbo-16k'
@@ -40,6 +33,9 @@ Running ChatBot (UI) on port 5000:
     "query":"good morning",
     "content":"Good morning! How can I assist you today?"
 }
- ```
-## Running Frontend
+```
 
+## Running Frontend on Port 5000
+Running ChatBot (UI) on port 5000:
+ - ```python3 frontend/app.py```
+ - Point the browser to ```http://127.0.0.1:5000```
