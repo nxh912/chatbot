@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <style>
-      * {
-          box-sizing: border-box
-      }
+    * {
+        box-sizing: border-box
+    }
 /* Set height of body and the document to 100% */
-      body, html {
-          height: 100%;
-          margin: 0;
-          font-family: Arial;
-      }
-      #chatbox {
+    body, html {
+        height: 600px;
+        margin: 0;
+        font-family: Arial;
+    }
+    #chatbox {
       margin-left: auto;
       margin-right: auto;
-      width: 40%;
+      width: 80%;
       margin-top: 60px;
     }
     #userInput {
@@ -36,7 +36,7 @@
     .userText {
       color: white;
       font-family: monospace;
-      font-size: 17px;
+      font-size: 16px;
       text-align: right;
       line-height: 30px;
     }
@@ -66,70 +66,130 @@
     .boxed {
       margin-left: auto;
       margin-right: auto;
-      width: 78%;
-      margin-top: 60px;
+      width: 600;
+      margin-top: 20px;
       border: 1px solid green;
     }
+    .slidecontainer {
+      width: 50%;
+    }
+    .slider {
+      -webkit-appearance: none;
+      width: 85%;
+      height: 15px;
+      border-radius: 5px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+    .slider:hover {
+      opacity: 1;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #04AA6D;
+      cursor: pointer;
+    }
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #04AA6D;
+
   </style>
 </head>
 <body>
-  <div>
   <h1 align="center"><b>ChatBot</b></h1>
   <h4 align="center"><b>Please type your text here</b></h4>
-    <div class="boxed">
-      LLM: 
-      <input type="text" id="gptmodel" list="LLMList" placeholder="Default LLM">
-      <datalist id="LLMList">
-        <option value="gpt-3.5-turbo" selected/> 
-        <option value="gpt-3.5-turbo-16k"/> 
-        <option value="gpt-3.5-turbo-1106"/> 
-        <option value="gpt-4o-mini"/> 
-      </datalist>
-  
-      <div>
-        <div id="chatbox">
-          <p class="botText">
-            <span>Hi! I am Chatbot</span>
-          </p>
-        </div>
-        <div id="userInput">
-          <input id="textInput" type="text" name="msg" placeholder="Message" />
-        </div>
+
+  <div style="width: 100%; overflow: hidden;">
+    <div style="width: 150px; float: left;">
+      <div class="botText">
+        <input type="text" id="gptmodel" list="LLMList" placeholder="Select LLM">
+        <datalist id="LLMList">
+          <option value="gpt-3.5-turbo" selected/> 
+          <option value="gpt-3.5-turbo-16k"/> 
+          <option value="gpt-3.5-turbo-1106"/> 
+          <option value="gpt-4o-mini"/> 
+        </datalist>
       </div>
-      <script>
-          function getBotResponse() {
-              var rawText = $("#textInput").val();
-              var llmText = $("#gptmodel").val()
-              var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
-              if ( typeof(llmText)=="undefined" || llmText == "") {
-                llmText = "gpt-3.5-turbo";
-                console.log(" llmText : " + llmText)
-              }
-              
-              $("#textInput").val("");
-              $("#chatbox").append(userHtml);
-              document
-                  .getElementById("userInput")
-                  .scrollIntoView({ block: "start", behavior: "smooth" });
-              $.get("http://127.0.0.1:8000/chat?", { query: rawText, model: llmText }).done(function (data) {
-                // console.log(data.content)
-                if ("content" in data) {
-                  console.log(data.content)
-                  var botHtml = '<p class="botText"><span>' + data.content + "</span></p>";
-                  $("#chatbox").append(botHtml);
-                  document
-                    .getElementById("userInput")
-                    .scrollIntoView({ block: "start", behavior: "smooth" });
-                }
-              });
-          }
-          $("#textInput").keypress(function (e) {
-            if (e.which == 13) {
-              getBotResponse();
-            }
-          });
-      </script>
     </div>
+    <div style="margin-left: 160px;">
+      <div class="chatbox">
+        <div class="slidecontainer">
+          <p>LLM temperture: <span id="temp">50</span></p>
+          <input type="range" min="0" max="100" value="0" class="slider" id="slider">
+        </div>
+        <script>
+          var slider = document.getElementById("slider");
+          var temp_val = document.getElementById("temp");
+          temp_val.innerHTML = slider.value;
+          slider.oninput = function() {
+            //console.log(this.value + "\n")
+            temp_val.innerHTML = this.value / 100;
+          }
+        </script>
+      </div>
+    </div>
+</div>
+
+  <div class="boxed">
+    <div>
+      <div id="chatbox">
+        <p class="botText">
+          <span>Hi! I am Chatbot</span>
+        </p>
+      </div>
+      <div id="userInput">
+        <input id="textInput" type="text" name="msg" placeholder="Message" />
+      </div>
+    </div>
+    <script>
+      function getBotResponse() {
+        var rawText = $("#textInput").val();
+        var llmText = $("#gptmodel").val()
+        var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
+        if ( typeof(llmText)=="undefined" || llmText == "") {
+          llmText = "gpt-3.5-turbo";
+          console.log(" llmText : " + llmText)
+        }
+        
+        $("#textInput").val("");
+        $("#chatbox").append(userHtml);
+        tempElement = document.getElementById("temp");
+        temperature = tempElement.innerHTML;
+        document
+            .getElementById("userInput")
+            .scrollIntoView({ block: "start", behavior: "smooth" });
+        $.get("http://127.0.0.1:8000/chat?", { query: rawText, model: llmText, temperature: temperature}).done(function (data) {
+          // console.log(data.content)
+          if ("content" in data) {
+            console.log(data.content)
+            var botHtml = '<p class="botText"><span>' + data.content + "</span></p>";
+            $("#chatbox").append(botHtml);
+            document
+              .getElementById("userInput")
+              .scrollIntoView({ block: "start", behavior: "smooth" });
+          }
+        });
+      }
+      $("#textInput").keypress(function (e) {
+        if (e.which == 13) {
+          getBotResponse();
+        }
+      });
+    </script>
   </div>
+
+
+
+
+
 </body>
 </html>
