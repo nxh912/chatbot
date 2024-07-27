@@ -129,14 +129,14 @@ def home():
 @app.route("/get")
 def get_bot_response( BotAPI="http://127.0.0.1:8000/chat"):
     userText = request.args.get('msg')
-    log.info("L133 userText : '%s'", userText)
     gptmodel = request.args.get('gptmodel')
-    log.info("L135 gptmodel : '%s'", gptmodel)
+    temperature = request.args.get('temperature')
     assert( gptmodel != 'None')
     log.info("L137 gptmodel : '%s'", gptmodel)
-    print( f"API URL : {BotAPI}?query={userText}&model={gptmodel}")
+    log.info("L137 temperature : '%s'", temperature)
+    print( f"API URL : {BotAPI}?query={userText}&model={gptmodel}&temperture={temperature}")
 
-    url=f"{BotAPI}?query={userText}&model={gptmodel}"
+    url=f"{BotAPI}?query={userText}&model={gptmodel}&temperture={temperature}"
     response = requests.get( url=f"{url}")
     print( response.content)
     
