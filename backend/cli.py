@@ -35,7 +35,6 @@ def main():
         #print(f"querystr = {querystr}")
         #print(f"queryurl : {ChatBotAPI}?{querystr}")
         response = requests.get( url=f"{ChatBotAPI}?{querystr}")
-
         if response :
             jsonarr = json.loads( response.content)
             #print("RESPONSE: ",  jsonarr['content'])    
