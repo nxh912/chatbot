@@ -108,36 +108,7 @@
   <h1 align="center"><b>ChatBot</b></h1>
   <h4 align="center"><b>Please type your text here</b></h4>
 
-  <div style="width: 100%; overflow: hidden;">
-    <div style="width: 150px; float: left;">
-      <div class="botText">
-        <input type="text" id="gptmodel" list="LLMList" placeholder="Select LLM">
-        <datalist id="LLMList">
-          <option value="gpt-3.5-turbo" selected/> 
-          <option value="gpt-3.5-turbo-16k"/> 
-          <option value="gpt-3.5-turbo-1106"/> 
-          <option value="gpt-4o-mini"/> 
-        </datalist>
-      </div>
-    </div>
-    <div style="margin-left: 160px;">
-      <div class="chatbox">
-        <div class="slidecontainer">
-          <p>LLM temperture: <span id="temp">50</span></p>
-          <input type="range" min="0" max="100" value="0" class="slider" id="slider">
-        </div>
-        <script>
-          var slider = document.getElementById("slider");
-          var temp_val = document.getElementById("temp");
-          temp_val.innerHTML = slider.value;
-          slider.oninput = function() {
-            //console.log(this.value + "\n")
-            temp_val.innerHTML = this.value / 100;
-          }
-        </script>
-      </div>
-    </div>
-</div>
+
 
   <div class="boxed">
     <div>
@@ -187,7 +158,36 @@
     </script>
   </div>
 
-
+  <div style="width: 100%; overflow: hidden;">
+    <div style="width: 150px; float: left;">
+      <div class="botText">
+        <input type="text" id="gptmodel" list="LLMList" placeholder="Select LLM">
+        <datalist id="LLMList">
+          <option value="gpt-3.5-turbo" selected/> 
+          <option value="gpt-3.5-turbo-16k"/> 
+          <option value="gpt-3.5-turbo-1106"/> 
+          <option value="gpt-4o-mini"/> 
+        </datalist>
+      </div>
+    </div>
+    <div style="margin-left: 160px;">
+      <div class="chatbox">
+        <div class="slidecontainer">
+          <p>LLM temperture: <span id="temp">50</span></p>
+          <input type="range" min="0" max="100" value="0" class="slider" id="slider">
+        </div>
+        <script>
+          var slider = document.getElementById("slider");
+          var temp_val = document.getElementById("temp");
+          temp_val.innerHTML = slider.value;
+          slider.oninput = function() {
+            //console.log(this.value + "\n")
+            temp_val.innerHTML = this.value / 100;
+          }
+        </script>
+      </div>
+    </div>
+  </div>
 
 
 
