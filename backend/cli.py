@@ -20,8 +20,10 @@ def main():
     assert( api_key)
     client = OpenAI( api_key=api_key )
 
+    print("Type your query to Chat Bot, (<Enter> to quit)"),
+
     while True:
-        print("Enter text to Bot >>> ", end=""),
+        print(">>> ", end=""),
         user_input = input()
         if not(user_input): break
 
@@ -29,32 +31,24 @@ def main():
 
         MODEL="gpt-3.5-turbo"
         querystr=f"query={urllib.parse.quote(user_input)}&model={urllib.parse.quote(MODEL)}"
-        print(f"ChatBotAPI = {ChatBotAPI}")
-        print(f"querystr = {querystr}")
-        print(f"Q : {ChatBotAPI}?{querystr}")
+        #print(f"ChatBotAPI = {ChatBotAPI}")
+        #print(f"querystr = {querystr}")
+        #print(f"queryurl : {ChatBotAPI}?{querystr}")
         response = requests.get( url=f"{ChatBotAPI}?{querystr}")
-        print( response.json())
-        assert(0)
 
-
-        response = requests.post( url="http://127.0.0.1:8000/chat", json=params)
-        print( response.json() )
-        #response = requests.post( ChatBotAPI, json=query)
-
-        assert(0)
-
-        if response and response.choices and response.choices[0]:
-            content = response.choices[0].message.content
+        if response :
+            jsonarr = json.loads( response.content)
+            #print("RESPONSE: ",  jsonarr['content'])    
             user_inputs.append( user_input)
-            llm_outputs.append( str(content ))
-            print(f"Bot : {content}\n")
+            llm_outputs.append( str( jsonarr['content'] ))
+            print(f"Bot : {jsonarr['content']}\n")
 
     ### print inputs and LLM outputs before exit
     assert( len(user_inputs)==len(llm_outputs))
-    print("\n\n=======================>\nLLM Log:")
+    print("\n\n=======================>\nAI Chat Log:\n")
     for i in range( len( user_inputs)):
-        print(f">>> {user_inputs[i]}")
-        print(f"bot: {llm_outputs[i]}\n")
+        print(f"ME : {user_inputs[i]}")
+        print(f"BOT: {llm_outputs[i]}\n")
 
 if __name__ == "__main__":
     main()
