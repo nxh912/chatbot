@@ -75,8 +75,7 @@
 <body>
   <div>
   <h1 align="center"><b>ChatBot</b></h1>
-  <h4 align="center"><b>Please type start your personalized interaction with the chatbot</b></h4>
-
+  <h4 align="center"><b>Please type your text here</b></h4>
     <div class="boxed">
       LLM: 
       <input type="text" id="gptmodel" list="LLMList" placeholder="Default LLM">
@@ -102,26 +101,32 @@
               var rawText = $("#textInput").val();
               var llmText = $("#gptmodel").val()
               var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
-              console.log(llmText)
-              //alert(llmText)
+              if ( typeof(llmText)=="undefined" || llmText == "") {
+                llmText = "gpt-3.5-turbo";
+                console.log(" llmText : " + llmText)
+              }
               
               $("#textInput").val("");
               $("#chatbox").append(userHtml);
               document
                   .getElementById("userInput")
                   .scrollIntoView({ block: "start", behavior: "smooth" });
-              $.get("/get", { msg: rawText, modelText: llmText }).done(function (data) {
-                  var botHtml = '<p class="botText"><span>' + data + "</span></p>";
+              $.get("http://127.0.0.1:8000/chat?", { query: rawText, model: llmText }).done(function (data) {
+                // console.log(data.content)
+                if ("content" in data) {
+                  console.log(data.content)
+                  var botHtml = '<p class="botText"><span>' + data.content + "</span></p>";
                   $("#chatbox").append(botHtml);
                   document
-                      .getElementById("userInput")
-                      .scrollIntoView({ block: "start", behavior: "smooth" });
+                    .getElementById("userInput")
+                    .scrollIntoView({ block: "start", behavior: "smooth" });
+                }
               });
           }
           $("#textInput").keypress(function (e) {
-              if (e.which == 13) {
-                  getBotResponse();
-              }
+            if (e.which == 13) {
+              getBotResponse();
+            }
           });
       </script>
     </div>
