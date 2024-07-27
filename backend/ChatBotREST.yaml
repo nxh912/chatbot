@@ -1,0 +1,87 @@
+openapi: 3.0.3
+info:
+  title: AI Chat Bot - OpenAPI 3.0
+  description: |-
+    https://github.com/nxh912/chatbot
+    
+  contact:
+    email: nxh912@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+
+servers:
+  - url: http://127.0.0.1:8000/chat?query=good+morning&model=gpt-3.5-turbo-16k
+tags:
+  - name: chat
+    description: ChatBot interacting with LLM
+paths:
+  /chat:
+    post:
+      tags:
+        - chat
+      summary: Send query to ChatBot
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: query to be sent to Chat Bot
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chat'
+      responses:
+        default:
+          description: reply from chatbot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chat'
+
+components:
+  schemas:
+    chat:
+      type: object
+      properties:
+        query:
+          type: string
+          description: query string to end to chatbot
+          example: Hello
+        model:
+          type: string
+          description: name of the Lang Language Model
+          example:  gpt-3.5-turbo, gpt-3.5-turbo-16k, gpt-3.5-turbo-1106, gpt-4o-mini
+
+
+      xml:
+        name: order
+
+  requestBodies:
+    Pet:
+      description: Pet object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/chat'
+
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/chat'
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
