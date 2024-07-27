@@ -7,6 +7,7 @@ import sqlite3
 import calendar
 import datetime
 import logging,traceback
+import requests, urllib.parse, json
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
@@ -88,7 +89,6 @@ def get_completion( prompt, modelText):
     date = datetime.datetime.utcnow()
     utc_time = calendar.timegm(date.utctimetuple())
 
-
     sql_query = """INSERT INTO ChatLog
                           ( message, datetime) 
                             VALUES ('{}',{});
@@ -127,15 +127,24 @@ def home():
     return render_template("index.html")
 
 @app.route("/get")
-def get_bot_response():
+def get_bot_response( BotAPI="http://127.0.0.1:8000/chat"):
     userText = request.args.get('msg')
     log.info("L133 userText : '%s'", userText)
     gptmodel = request.args.get('gptmodel')
     log.info("L135 gptmodel : '%s'", gptmodel)
     assert( gptmodel != 'None')
     log.info("L137 gptmodel : '%s'", gptmodel)
-    response = get_completion( userText, gptmodel)
-    return response
+    print( f"API URL : {BotAPI}?query={userText}&model={gptmodel}")
+
+    url=f"{BotAPI}?query={userText}&model={gptmodel}"
+    response = requests.get( url=f"{url}")
+    print( response.content)
+    
+    if response :
+        jsonarr = json.loads( response.content)
+        print(f"Bot : {jsonarr['content']}\n")
+        return jsonarr['content']
+    return "No response from bot"
 
 if __name__ == "__main__":  
     app.run(debug=True)
