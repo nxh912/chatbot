@@ -108,8 +108,6 @@
   <h1 align="center"><b>ChatBot</b></h1>
   <h4 align="center"><b>Please type your text here</b></h4>
 
-
-
   <div class="boxed">
     <div>
       <div id="chatbox">
@@ -155,13 +153,24 @@
           getBotResponse();
         }
       });
+
+      function llmSelected() {
+        var llmText = $("#gptmodel").val()
+        console.log( llmText )
+        var botHtml = "<p class='botText'><span>I'm now is using model: " + llmText + '</span></p>';
+        $("#chatbox").append(botHtml);
+      }
     </script>
   </div>
 
   <div style="width: 100%; overflow: hidden;">
     <div style="width: 150px; float: left;">
       <div class="botText">
-        <input type="text" id="gptmodel" list="LLMList" placeholder="Select LLM">
+        <input
+          type="text" id="gptmodel"
+          onchange="llmSelected();"
+          list="LLMList"
+          placeholder="Select LLM" />
         <datalist id="LLMList">
           <option value="gpt-3.5-turbo" selected/> 
           <option value="gpt-3.5-turbo-16k"/> 
