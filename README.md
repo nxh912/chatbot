@@ -7,7 +7,7 @@ MVP comprises:
 1. Task 1: A backend component that interacts with the LLMs
 1. Task 2: A frontend component that presents LLM data to the users
 
-## Installation
+## Task 1
 Running ChatBot (CLI) on port 8000:
  - ```export OPENAI_API_KEY=sk-None-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx```
  - ```cd backend```
@@ -35,7 +35,11 @@ fastapi dev backend/ChatBotREST.py
 }
 ```
 
-## Running Frontend on Port 5000
+## Task 2 Frontend (on Port 5000)
 Running ChatBot (UI) on port 5000:
  - ```python3 frontend/app.py```
  - Point the browser to ```http://127.0.0.1:5000```
+
+## Extra:
+- Bot can use different
+- 
