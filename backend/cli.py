@@ -31,9 +31,7 @@ def main():
 
         MODEL="gpt-3.5-turbo"
         querystr=f"query={urllib.parse.quote(user_input)}&model={urllib.parse.quote(MODEL)}&temperature=0.5"
-        #print(f"ChatBotAPI = {ChatBotAPI}")
-        #print(f"querystr = {querystr}")
-        #print(f"queryurl : {ChatBotAPI}?{querystr}")
+
         response = requests.get( url=f"{ChatBotAPI}?{querystr}")
         if response :
             jsonarr = json.loads( response.content)
